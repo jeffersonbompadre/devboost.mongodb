@@ -1,5 +1,4 @@
 ﻿using devboost.Domain.Model;
-using devboost.Domain.MongoDBModel;
 using devboost.Domain.Repository;
 using devboost.MongoDB.Repository.Context.Interfaces;
 using MongoDB.Driver;
@@ -9,42 +8,39 @@ using System.Threading.Tasks;
 
 namespace devboost.MongoDB.Repository
 {
-    public class PedidoMGDBRepository : IPedidoMGDBRepository
+    public class PedidoMGDBRepository : IPedidoRepository
     {
-        readonly IMongoCollection<PedidoMGDB> _pedidos;
+        readonly IMongoCollection<Pedido> _pedidos;
 
         public PedidoMGDBRepository(IMongoDBContext mongoDBContext)
         {
-            _pedidos = mongoDBContext.GetDatabase().GetCollection<PedidoMGDB>("pedido");
+            _pedidos = mongoDBContext.GetDatabase().GetCollection<Pedido>("pedido");
         }
 
-        public async Task<PedidoMGDB> GetPedidoByPagamento(Guid pagamentoId)
+        public async Task<Pedido> GetPedidoByPagamento(Guid pagamentoId)
         {
             return await _pedidos.Find(pedido => true).FirstOrDefaultAsync();
         }
 
-        public async Task<List<PedidoMGDB>> GetPedidos(StatusPedido statusPedido)
+        public async Task<List<Pedido>> GetPedidos(StatusPedido statusPedido)
         {
             return await _pedidos.Find(pedido => pedido.StatusPedido == statusPedido)
                 .ToListAsync();
         }
 
-        public async Task<List<PedidoMGDB>> GetPedidos(StatusPedido statusPedido, double distancia, int peso)
+        public async Task<List<Pedido>> GetPedidos(StatusPedido statusPedido, double distancia, int peso)
         {
-            return await _pedidos.Find(pedido => 
-                pedido.StatusPedido == statusPedido &&
-                pedido.DistanciaParaOrigem == distancia &&
-                pedido.Peso <= peso
-            )
-            .ToListAsync();
+            return await _pedidos
+                .Find(pedido => pedido.StatusPedido == statusPedido && pedido.DistanciaParaOrigem <= distancia && pedido.Peso <= peso)
+                .ToListAsync();
         }
 
-        public async Task AddPedido(PedidoMGDB pedido)
+        public async Task AddPedido(Pedido pedido)
         {
             await _pedidos.InsertOneAsync(pedido);
         }
 
-        public async Task UpdatePedido(PedidoMGDB pedido)
+        public async Task UpdatePedido(Pedido pedido)
         {
             await _pedidos.ReplaceOneAsync(p => p.Id == pedido.Id, pedido);
         }

@@ -47,7 +47,7 @@ namespace devboost.dronedelivery
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IPedidoRepository, PedidoRepository>();
+            //services.AddScoped<IPedidoRepository, PedidoRepository>();
             services.AddScoped<IDroneRepository, DroneRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IClienteRepository, ClienteRepository>();
@@ -69,7 +69,7 @@ namespace devboost.dronedelivery
             var databaseName = Configuration["MongoDbSettings:DatabaseName"];
 
             services.AddScoped<IMongoDBContext>(x => new MongoDBContext(connectionString, databaseName));
-            services.AddScoped<IPedidoMGDBRepository, PedidoMGDBRepository>();
+            services.AddScoped<IPedidoRepository, PedidoMGDBRepository>();
 
             // Evita o Loop Referência na serialização do JSON
             services.AddControllers().AddNewtonsoftJson(options =>

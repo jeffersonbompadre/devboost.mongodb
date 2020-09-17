@@ -2,7 +2,6 @@
 using devboost.Domain.Entities;
 using devboost.Domain.Handles.Commands.Interfaces;
 using devboost.Domain.Model;
-using devboost.Domain.MongoDBModel;
 using devboost.Domain.Repository;
 using System;
 using System.Threading.Tasks;
@@ -14,17 +13,15 @@ namespace devboost.Domain.Handles.Commands
         const double LATITUDE = -23.5880684;
         const double LONGITUDE = -46.6564195;
 
-        readonly IPedidoMGDBRepository _pedidoMGDBRepository;
         readonly IPedidoRepository _pedidoRepository;
         readonly IDroneRepository _droneRepository;
         readonly IClienteRepository _clienteRepository;
         readonly IPagamentoRepository _pagamentoRepository;
         readonly IPayAPIHandler _payAPIHandler;
 
-        public PedidoHandler(IPedidoRepository pedidoRepository, IPedidoMGDBRepository pedidoMGDBRepository, IDroneRepository droneRepository, IClienteRepository clienteRepository, IPagamentoRepository pagamentoRepository, IPayAPIHandler payAPIHandler)
+        public PedidoHandler(IPedidoRepository pedidoRepository, IDroneRepository droneRepository, IClienteRepository clienteRepository, IPagamentoRepository pagamentoRepository, IPayAPIHandler payAPIHandler)
         {
             _pedidoRepository = pedidoRepository;
-            _pedidoMGDBRepository = pedidoMGDBRepository;
             _droneRepository = droneRepository;
             _clienteRepository = clienteRepository;
             _pagamentoRepository = pagamentoRepository;
@@ -48,7 +45,7 @@ namespace devboost.Domain.Handles.Commands
                 StatusCartao.aguardandoAprovacao
             );
             // Salva o pedido na base
-            var pedido = new PedidoMGDB
+            var pedido = new Pedido
             {
                 Cliente = cliente,
                 DataHora = DateTime.Now,
@@ -58,7 +55,7 @@ namespace devboost.Domain.Handles.Commands
                 PagamentoCartao = pagamento
             };
             //await _pedidoRepository.AddPedido(pedido);
-            await _pedidoMGDBRepository.AddPedido(pedido);
+            await _pedidoRepository.AddPedido(pedido);
             // Envia o pedido para Pagamento
             var pagamentoREquest = new CmmPagRequest()
             {
@@ -75,17 +72,7 @@ namespace devboost.Domain.Handles.Commands
             var result = await _payAPIHandler.PostRealizarPagamento(pagamentoREquest);
             if (!result.IsSuccessStatusCode)
                 throw new Exception("Falha ao realizar o pagamento");
-
-            return new Pedido
-            {
-                Id = new Guid(pedido.Id),
-                Cliente = cliente,
-                DataHora = pedido.DataHora,
-                Peso = pedidoRequest.Peso,
-                DistanciaParaOrigem = distancia,
-                StatusPedido = StatusPedido.aguardandoAprovacao,
-                PagamentoCartao = pagamento
-            }; ;
+            return pedido;
         }
 
         public async Task DistribuirPedido()
@@ -99,7 +86,7 @@ namespace devboost.Domain.Handles.Commands
                 //Automomia do Drone dividido por 2
                 var droneAutonomia = drone.AutonomiaEmKM / 2;
                 var dronePeso = drone.Capacidade;
-                var pedidos = await _pedidoRepository.GetPedidos(StatusPedido.aguardandoEntrega, droneAutonomia, dronePeso);
+                var pedidos = await _pedidoRepository.GetPedidos(StatusPedido.aguardandoAprovacao, droneAutonomia, dronePeso);
                 //Varre os pedidos, e atribui ao Drone.
                 //a cada atribuição, subtra-se a autonomia e peso do Drone, para ver se é possível
                 //continuar atribuindo aos pedidos

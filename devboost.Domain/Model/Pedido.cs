@@ -1,4 +1,5 @@
 ﻿using devboost.Domain.Entities;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,12 +17,15 @@ namespace devboost.Domain.Model
         [NotMapped]
         public string DescricaoStatus => PedidoDescricaoStatus.GetDescricaoStatus(StatusPedido);
 
+        [BsonIgnore]
         public Guid ClienteId { get; set; }
         public Cliente Cliente { get; set; }
 
+        [BsonIgnore]
         public Guid PagamentoCartaoId { get; set; }
         public PagamentoCartao PagamentoCartao { get; set; }
 
+        [BsonIgnore]
         public List<PedidoDrone> PedidosDrones { get; set; } = new List<PedidoDrone>();
     }
 
