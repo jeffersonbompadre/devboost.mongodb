@@ -37,7 +37,7 @@ IF OBJECT_ID('Usuario') IS NOT NULL
 GO
 
 IF OBJECT_ID('Payment') IS NOT NULL
-    DROP TABLE [Usuario]
+    DROP TABLE [Payment]
 GO
 
 -- Cria as tabelas novamente
@@ -149,11 +149,6 @@ CREATE TABLE [dbo].[Pedido_Drone](
 	[Pedido_Id], [Drone_Id] ASC
 ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
-GO
-ALTER TABLE [dbo].[Pedido_Drone]  WITH CHECK ADD CONSTRAINT [FK_Pedido_Drone_Pedido] FOREIGN KEY([Pedido_Id])
-REFERENCES [dbo].[Pedido] ([Id])
-GO
-ALTER TABLE [dbo].[Pedido_Drone] CHECK CONSTRAINT [FK_Pedido_Drone_Pedido]
 GO
 ALTER TABLE [dbo].[Pedido_Drone]  WITH CHECK ADD CONSTRAINT [FK_Pedido_Drone_Drone] FOREIGN KEY([Drone_Id])
 REFERENCES [dbo].[Drone] ([Id])

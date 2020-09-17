@@ -23,6 +23,11 @@ namespace devboost.Repository
             return await _dataContext.Pedido.FirstOrDefaultAsync(x => x.PagamentoCartaoId == pagamentoId);
         }
 
+        public async Task<Pedido> GetPedidoById(Guid pedidoId)
+        {
+            return await _dataContext.Pedido.FirstOrDefaultAsync(x => x.Id == pedidoId);
+        }
+
         public async Task<List<Pedido>> GetPedidos(StatusPedido statusPedido)
         {
             return await _dataContext.Pedido
@@ -47,12 +52,6 @@ namespace devboost.Repository
         public async Task UpdatePedido(Pedido pedido)
         {
             _dataContext.Pedido.Update(pedido);
-            await _dataContext.SaveChangesAsync();
-        }
-
-        public async Task AddPedidoDrone(PedidoDrone pedidoDrone)
-        {
-            _dataContext.PedidoDrone.Add(pedidoDrone);
             await _dataContext.SaveChangesAsync();
         }
     }

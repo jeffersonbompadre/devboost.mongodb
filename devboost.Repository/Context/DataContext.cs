@@ -75,11 +75,6 @@ namespace devboost.Repository.Context
                 .HasColumnName("Drone_Id");
 
             builder.Entity<PedidoDrone>()
-                .HasOne(x => x.Pedido)
-                .WithMany(x => x.PedidosDrones)
-                .HasForeignKey(x => x.PedidoId);
-
-            builder.Entity<PedidoDrone>()
                 .HasOne(x => x.Drone)
                 .WithMany(x => x.PedidosDrones)
                 .HasForeignKey(x => x.DroneId);

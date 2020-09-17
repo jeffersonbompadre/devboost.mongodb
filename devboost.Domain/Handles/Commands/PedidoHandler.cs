@@ -14,14 +14,16 @@ namespace devboost.Domain.Handles.Commands
         const double LONGITUDE = -46.6564195;
 
         readonly IPedidoRepository _pedidoRepository;
+        readonly IPedidoDroneRepository _pedidoDroneRepository;
         readonly IDroneRepository _droneRepository;
         readonly IClienteRepository _clienteRepository;
         readonly IPagamentoRepository _pagamentoRepository;
         readonly IPayAPIHandler _payAPIHandler;
 
-        public PedidoHandler(IPedidoRepository pedidoRepository, IDroneRepository droneRepository, IClienteRepository clienteRepository, IPagamentoRepository pagamentoRepository, IPayAPIHandler payAPIHandler)
+        public PedidoHandler(IPedidoRepository pedidoRepository, IPedidoDroneRepository pedidoDroneRepository, IDroneRepository droneRepository, IClienteRepository clienteRepository, IPagamentoRepository pagamentoRepository, IPayAPIHandler payAPIHandler)
         {
             _pedidoRepository = pedidoRepository;
+            _pedidoDroneRepository = pedidoDroneRepository;
             _droneRepository = droneRepository;
             _clienteRepository = clienteRepository;
             _pagamentoRepository = pagamentoRepository;
@@ -86,7 +88,7 @@ namespace devboost.Domain.Handles.Commands
                 //Automomia do Drone dividido por 2
                 var droneAutonomia = drone.AutonomiaEmKM / 2;
                 var dronePeso = drone.Capacidade;
-                var pedidos = await _pedidoRepository.GetPedidos(StatusPedido.aguardandoAprovacao, droneAutonomia, dronePeso);
+                var pedidos = await _pedidoRepository.GetPedidos(StatusPedido.aguardandoEntrega, droneAutonomia, dronePeso);
                 //Varre os pedidos, e atribui ao Drone.
                 //a cada atribuição, subtra-se a autonomia e peso do Drone, para ver se é possível
                 //continuar atribuindo aos pedidos
@@ -97,7 +99,7 @@ namespace devboost.Domain.Handles.Commands
                         //Vincula Pedido ao Drone, e atualiza status Drone e Pedido
                         drone.StatusDrone = StatusDrone.emTrajeto;
                         pedido.StatusPedido = StatusPedido.despachado;
-                        await _pedidoRepository.AddPedidoDrone(new PedidoDrone { Drone = drone, Pedido = pedido });
+                        await _pedidoDroneRepository.AddPedidoDrone(new PedidoDrone { Drone = drone, PedidoId = pedido.Id });
                         await _pedidoRepository.UpdatePedido(pedido);
                         await _droneRepository.UpdateDrone(drone);
                         //Subtrai a autonomia e peso, para ver se cabe outro pedido
@@ -110,21 +112,16 @@ namespace devboost.Domain.Handles.Commands
 
         public async Task AtualizaStatusPagamento(PagamentoCartao pagtoRetornado)
         {
-            // Atualiza o pagamento, caso encontre na base
-            var pagto = (PagamentoCartao)_pagamentoRepository.GetById(pagtoRetornado.Id).Result;
-            if (pagto == null)
-                throw new Exception("Pagamento não localizado");
             // Atualiza status do pedido, conforme o status do pagamento foi retornado
-            var pedido = await _pedidoRepository.GetPedidoByPagamento(pagto.Id);
+            var pedido = await _pedidoRepository.GetPedidoByPagamento(pagtoRetornado.Id);
             if (pedido == null)
                 throw new Exception("Pedido não localizado para o pagamento");
             // Ajusta o status do pedido e pagamento
-            pagto.Status = pagtoRetornado.Status;
+            pedido.PagamentoCartao.Status = pagtoRetornado.Status;
             pedido.StatusPedido = pagtoRetornado.Status == StatusCartao.aprovado
                 ? StatusPedido.aguardandoEntrega
                 : StatusPedido.reprovado;
-            // Atualiza pagamento e pedido
-            await _pagamentoRepository.UpdatePagamento(pagto);
+            // Atualiza pedido
             await _pedidoRepository.UpdatePedido(pedido);
         }
     }

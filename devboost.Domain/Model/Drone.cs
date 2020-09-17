@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace devboost.Domain.Model
@@ -31,7 +32,11 @@ namespace devboost.Domain.Model
             }
         }
 
+        [JsonIgnore]
         public List<PedidoDrone> PedidosDrones { get; set; } = new List<PedidoDrone>();
+
+        [NotMapped]
+        public List<Pedido> Pedidos { get; set; } = new List<Pedido>();
 
         [NotMapped]
         public double AutonomiaEmKM

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace devboost.Domain.Model
 {
@@ -22,6 +23,8 @@ namespace devboost.Domain.Model
         public string Numero { get; set; }
         public DateTime Vencimento { get; set; }
         public int CodigoSeguranca { get; set; }
+
+        [JsonIgnore]
         public StatusCartao Status { get; set; }
 
         [NotMapped]
@@ -43,6 +46,7 @@ namespace devboost.Domain.Model
             }
         }
 
+        [JsonIgnore]
         public List<Pedido> Pedidos { get; set; } = new List<Pedido>();
     }
 

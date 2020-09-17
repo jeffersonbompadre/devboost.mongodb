@@ -28,8 +28,6 @@ namespace devboost.Repository
         {
             var drones = await _dataContext.Drone
                 .Include(x => x.PedidosDrones)
-                .ThenInclude(x => x.Pedido)
-                .ThenInclude(x => x.Cliente)
                 .ToListAsync();
             return drones;
         }

@@ -19,7 +19,12 @@ namespace devboost.MongoDB.Repository
 
         public async Task<Pedido> GetPedidoByPagamento(Guid pagamentoId)
         {
-            return await _pedidos.Find(pedido => true).FirstOrDefaultAsync();
+            return await _pedidos.Find(pedido => pedido.PagamentoCartao.Id == pagamentoId).FirstOrDefaultAsync();
+        }
+
+        public async Task<Pedido> GetPedidoById(Guid pedidoId)
+        {
+            return await _pedidos.Find(pedido => pedido.Id == pedidoId).FirstOrDefaultAsync();
         }
 
         public async Task<List<Pedido>> GetPedidos(StatusPedido statusPedido)
@@ -43,11 +48,6 @@ namespace devboost.MongoDB.Repository
         public async Task UpdatePedido(Pedido pedido)
         {
             await _pedidos.ReplaceOneAsync(p => p.Id == pedido.Id, pedido);
-        }
-
-        public async Task AddPedidoDrone(PedidoDrone pedidoDrone)
-        {
-            throw new NotImplementedException();
         }
     }
 }

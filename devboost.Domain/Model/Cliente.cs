@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace devboost.Domain.Model
 {
@@ -22,9 +23,13 @@ namespace devboost.Domain.Model
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
+        [JsonIgnore]
         public Guid UserId { get; set; }
+
+        [JsonIgnore]
         public User User { get; set; }
 
+        [JsonIgnore]
         public List<Pedido> Pedidos { get; set; } = new List<Pedido>();
 
         public bool IsValid()
