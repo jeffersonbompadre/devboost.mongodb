@@ -15,7 +15,7 @@ namespace devboost.MongoDB.Repository
 
         public PedidoMGDBRepository(IMongoDBContext mongoDBContext)
         {
-            _pedidos = mongoDBContext.Database.GetCollection<PedidoMGDB>("pedido");
+            _pedidos = mongoDBContext.GetDatabase().GetCollection<PedidoMGDB>("pedido");
         }
 
         public async Task<PedidoMGDB> GetPedidoByPagamento(Guid pagamentoId)

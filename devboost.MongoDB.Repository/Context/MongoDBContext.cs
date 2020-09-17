@@ -1,8 +1,5 @@
 ﻿using devboost.MongoDB.Repository.Context.Interfaces;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace devboost.MongoDB.Repository.Context
 {
@@ -17,14 +14,11 @@ namespace devboost.MongoDB.Repository.Context
             _databaseName = databaseName;
         }
 
-        public IMongoDatabase Database
+        public IMongoDatabase GetDatabase()
         {
-            get
-            {
-                var client = new MongoClient(_connectionString);
-                var database = client.GetDatabase(_databaseName);
-                return database;
-            }
+            var client = new MongoClient(_connectionString);
+            var database = client.GetDatabase(_databaseName);
+            return database;
         }
     }
 }

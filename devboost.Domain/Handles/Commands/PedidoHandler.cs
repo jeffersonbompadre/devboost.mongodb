@@ -50,7 +50,6 @@ namespace devboost.Domain.Handles.Commands
             // Salva o pedido na base
             var pedido = new PedidoMGDB
             {
-                Id = Guid.NewGuid().ToString(),
                 Cliente = cliente,
                 DataHora = DateTime.Now,
                 Peso = pedidoRequest.Peso,
@@ -66,7 +65,7 @@ namespace devboost.Domain.Handles.Commands
                 Bandeira = pagamento.Bandeira,
                 CodigoSeguranca = pagamento.CodigoSeguranca,
                 CreatedAt = DateTime.Now,
-                Name = pedido.Cliente.Nome,
+                Name = cliente.Nome,
                 NumeroCartao = pagamento.Numero,
                 PayId = pagamento.Id,
                 Status = StatusCartao.aguardandoAprovacao,
